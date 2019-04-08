@@ -261,6 +261,8 @@ else
         USE_JRF_WLST=TRUE
     elif [ "${DOMAIN_TYPE}" = "JRF" ]; then
         USE_JRF_WLST=TRUE
+    elif [ "${DOMAIN_TYPE}" = "SOA" ]; then
+        USE_JRF_WLST=TRUE
     else
         echo "Wrong domain type specified ${DOMAIN_TYPE}: valid value is WLS|JRF|RestrictedJRF"
         exit 98
