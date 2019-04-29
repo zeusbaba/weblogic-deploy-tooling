@@ -28,8 +28,8 @@ class DomainTypedef(object):
     __domain_typedefs_location = os.path.join(os.environ.get('WLSDEPLOY_HOME'), 'lib', 'typedefs')
     __domain_typedef_extension = '.json'
 
-    __wild_card_suffix = '%%'
-    __wild_card_suffix_len = len(__wild_card_suffix)
+    JRF_TEMPLATE_REGEX = "^(.*jrf_template[0-9._]*\\.jar)|(Oracle JRF WebServices Asynchronous services)$"
+    RESTRICTED_JRF_TEMPLATE_REGEX = "^(Oracle Restricted JRF)$"
 
     def __init__(self, program_name, domain_type):
         """
@@ -95,19 +95,33 @@ class DomainTypedef(object):
         """
         return self._domain_type
 
-    def domain_type_is_jrf(self):
+    def has_jrf_resources(self):
         """
-        Determine if the tool is running with domain type JRF or RestrictedJRF.
-        :return : True if running with domain type JRF or RestrictedJRF.
+        Determine if the domain type has domain resources from either the JRF or Restricted JRF templates.
+        :return: True if the domain type has resources from one of the JRF type
         """
-        return self.get_domain_type() == 'JRF' or self.get_domain_type() == 'RestrictedJRF'
+        return self.is_jrf_domain_type() or self.is_restricted_jrf_domain_type()
 
-    def domain_type_has_jrf_resources(self):
+    def is_jrf_domain_type(self):
         """
-        Does the running domain type contain the JRF server group ?
-        :return:
+        Determine if this is a JRF domain type by checking for the JRF extension template.
+        This returns False for the Restricted JRF domain type.
+        :return: True if the JRF template is present
         """
-        return 'JRF-MAN-SVR' in self.get_server_groups_to_target()
+        for template in self.get_extension_templates():
+            if re.match(self.JRF_TEMPLATE_REGEX, template):
+                return True
+        return False
+
+    def is_restricted_jrf_domain_type(self):
+        """
+        Determine if this domain type applies the Restricted JRF template.
+        :return: True if the Restricted JRF template is in the extension templates list
+        """
+        for template in self.get_extension_templates():
+            if re.match(self.RESTRICTED_JRF_TEMPLATE_REGEX, template):
+                return True
+            return False
 
     def get_base_template(self):
         """
@@ -118,6 +132,14 @@ class DomainTypedef(object):
         self.__resolve_paths()
         return self._domain_typedef['baseTemplate']
 
+    def has_extension_templates(self):
+        """
+        Determine if the domain type has extension templates.
+        :return: True if the domain type will apply extension templates
+        """
+        ets = self.get_extension_templates()
+        return ets is not None and len(ets) > 0
+
     def get_extension_templates(self):
         """
         Get the list of extension templates to apply when create/extending the domain.
@@ -126,6 +148,15 @@ class DomainTypedef(object):
         """
         self.__resolve_paths()
         return list(self._domain_typedef['extensionTemplates'])
+
+    def get_custom_extension_templates(self):
+        """
+        Get the list of custom extension templates to apply when create/extending the domain.
+        :return: the list of custom extension templates, or an empty list if no extension templates are needed.
+        :raises: CreateException: if an error occurs resolving the paths
+        """
+        self.__resolve_paths()
+        return list(self._domain_typedef['customExtensionTemplates'])
 
     def get_server_groups_to_target(self):
         """
@@ -290,6 +321,15 @@ class DomainTypedef(object):
                 self._domain_typedef['extensionTemplates'] = resolved_templates
             else:
                 self._domain_typedef['extensionTemplates'] = []
+
+            if 'customExtensionTemplates' in self._domain_typedef:
+                extension_templates = self._domain_typedef['customExtensionTemplates']
+                resolved_templates = []
+                for extension_template in extension_templates:
+                    resolved_templates.append(self._model_context.replace_token_string(extension_template))
+                self._domain_typedef['customExtensionTemplates'] = resolved_templates
+            else:
+                self._domain_typedef['customExtensionTemplates'] = []
 
             if 'serverGroupsToTarget' not in self._domain_typedef:
                 self._domain_typedef['serverGroupsToTarget'] = []
