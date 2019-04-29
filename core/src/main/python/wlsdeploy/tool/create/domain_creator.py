@@ -39,6 +39,7 @@ from wlsdeploy.aliases.model_constants import LOG_FILTER
 from wlsdeploy.aliases.model_constants import MACHINE
 from wlsdeploy.aliases.model_constants import MIGRATABLE_TARGET
 from wlsdeploy.aliases.model_constants import NAME
+from wlsdeploy.aliases.model_constants import OIM_CREDENTIALS
 from wlsdeploy.aliases.model_constants import PARTITION
 from wlsdeploy.aliases.model_constants import PASSWORD
 from wlsdeploy.aliases.model_constants import PASSWORD_ENCRYPTED
@@ -70,6 +71,7 @@ from wlsdeploy.exception.expection_types import ExceptionType
 from wlsdeploy.tool.create import atp_helper
 from wlsdeploy.tool.create.rcudbinfo_helper import RcuDbInfo
 from wlsdeploy.tool.create.creator import Creator
+from wlsdeploy.tool.create.oim_credentials import OIMCredentials
 from wlsdeploy.tool.create.security_provider_creator import SecurityProviderCreator
 from wlsdeploy.tool.deploy import deployer_utils
 from wlsdeploy.tool.deploy import model_deployer
@@ -325,6 +327,9 @@ class DomainCreator(Creator):
             self.__create_base_domain(self._domain_home)
             self.__extend_domain(self._domain_home)
 
+        if domain_type in ['OIM']:
+            self.__set_oim_credentials()
+
         if len(self.files_to_extract_from_archive) > 0:
             for file_to_extract in self.files_to_extract_from_archive:
                 self.archive_helper.extract_file(file_to_extract)
@@ -460,6 +465,12 @@ class DomainCreator(Creator):
 
         self.logger.info('WLSDPLY-12212', class_name=self.__class_name, method_name=_method_name)
         self.wlst_helper.load_templates()
+
+        # remove all template manged servers
+        domain_type = self.model_context.get_domain_type()
+        if domain_type in ['SOA']:
+            self.__remove_default_template_servers()
+
 
         topology_folder_list = self.alias_helper.get_model_topology_top_level_folder_names()
         self.__apply_base_domain_config(topology_folder_list)
@@ -1085,4 +1096,57 @@ class DomainCreator(Creator):
         security_config_location = LocationContext().add_name_token(domain_name_token, self._domain_name)
         self.security_provider_creator.create_security_configuration(security_config_location)
         self.logger.exiting(class_name=self.__class_name, method_name=_method_name)
+        return
+
+    def __set_oim_credentials(self):
+        """
+        Sst the oim credentials
+        :return:
+        """
+        _method_name = '__set_oim_credentials'
+        self.logger.entering(class_name=self.__class_name, method_name=_method_name)
+
+        if OIM_CREDENTIALS in self._domain_info:
+            oim_credentials = OIMCredentials(self.alias_helper, self._domain_info[OIM_CREDENTIALS])
+            self.wlst_helper.cd('/Credential/TargetStore/oim/TargetKey/keystore')
+            self.wlst_helper.create('c', 'Credential')
+            self.wlst_helpercd('Credential')
+            self.wlst_helper.set('Username', oim_credentials.get_keystore_user())
+            self.wlst_helper.set('Password', oim_credentials.get_keystore_password())
+            self.wlst_helper.cd('/Credential/TargetStore/oim/TargetKey/OIMSchemaPassword')
+            self.wlst_helper.create('c', 'Credential')
+            self.wlst_helper.cd('Credential')
+            self.wlst_helper.set('Username', oim_credentials.get_schema_user())
+            self.wlst_helper.set('Password', oim_credentials.get_keystore_password())
+            self.wlst_helper.cd('/Credential/TargetStore/oim/TargetKey/sysadmin')
+            self.wlst_helper.create('c', 'Credential')
+            self.wlst_helper.cd('Credential')
+            self.wlst_helper.set('Username', oim_credentials.get_schema_user())
+            self.wlst_helper.set('Password', oim_credentials.get_schema_password())
+            self.wlst_helper.cd('/Credential/TargetStore/oim/TargetKey/WeblogicAdminKey')
+            self.wlst_helper.create('c', 'Credential')
+            self.wlst_helper.cd('Credential')
+            self.wlst_helper.set('Username', oim_credentials.get_weblogic_admin_user())
+            self.wlst_helper.set('Password', oim_credentials.get_weblogic_admin_password())
+            self.logger.exiting(class_name=self.__class_name, method_name=_method_name)
+        else:
+            ex = exception_helper.create_create_exception('WLSDPLY-12414')
+            self.logger.throwing(ex, class_name=self.__class_name, method_name=_method_name)
+            raise ex
+
+        return
+
+    def __remove_default_template_servers(self):
+        self.wlst_helper.cd('/')
+        default_admin_server_name = self.wlst_helper.get(ADMIN_SERVER_NAME)
+        location = LocationContext()
+        location.append_location(SERVER)
+        folder_path = self.alias_helper.get_wlst_list_path(location)
+        self.wlst_helper.cd(folder_path)
+        servers = self.wlst_helper.lsc()
+        self.wlst_helper.cd('/')
+        if servers is not None:
+            for server in servers:
+                if server != default_admin_server_name:
+                    self.wlst_helper.delete(server, SERVER)
         return
