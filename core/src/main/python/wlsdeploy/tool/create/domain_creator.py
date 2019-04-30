@@ -327,9 +327,6 @@ class DomainCreator(Creator):
             self.__create_base_domain(self._domain_home)
             self.__extend_domain(self._domain_home)
 
-        if domain_type in ['OIM']:
-            self.__set_oim_credentials()
-
         if len(self.files_to_extract_from_archive) > 0:
             for file_to_extract in self.files_to_extract_from_archive:
                 self.archive_helper.extract_file(file_to_extract)
@@ -468,7 +465,7 @@ class DomainCreator(Creator):
 
         # remove all template manged servers
         domain_type = self.model_context.get_domain_type()
-        if domain_type in ['SOA']:
+        if domain_type in ['SOA', 'OIM']:
             self.__remove_default_template_servers()
 
 
@@ -481,6 +478,9 @@ class DomainCreator(Creator):
 
         self.logger.info('WLSDPLY-12206', self._domain_name, domain_home,
                          class_name=self.__class_name, method_name=_method_name)
+
+        if domain_type == 'OIM':
+            self.__set_oim_credentials()
 
         server_groups_to_target = self._domain_typedef.get_server_groups_to_target()
         server_assigns, dynamic_assigns = self.target_helper.target_server_groups_to_servers(server_groups_to_target)
@@ -1105,12 +1105,12 @@ class DomainCreator(Creator):
         """
         _method_name = '__set_oim_credentials'
         self.logger.entering(class_name=self.__class_name, method_name=_method_name)
-
+        print self._domain_info
         if OIM_CREDENTIALS in self._domain_info:
             oim_credentials = OIMCredentials(self.alias_helper, self._domain_info[OIM_CREDENTIALS])
             self.wlst_helper.cd('/Credential/TargetStore/oim/TargetKey/keystore')
             self.wlst_helper.create('c', 'Credential')
-            self.wlst_helpercd('Credential')
+            self.wlst_helper.cd('Credential')
             self.wlst_helper.set('Username', oim_credentials.get_keystore_user())
             self.wlst_helper.set('Password', oim_credentials.get_keystore_password())
             self.wlst_helper.cd('/Credential/TargetStore/oim/TargetKey/OIMSchemaPassword')

@@ -1,0 +1,187 @@
+{
+    "copyright": "Copyright (c) 2017, 2019, Oracle and/or its affiliates. All rights reserved.",
+    "license": "The Universal Permissive License (UPL), Version 1.0",
+    "name": "OIM",
+    "description": "OIM type domain definitions",
+    "versions": {
+        "12.2.1.3": "OIM_12213",
+        "19.1":     "OIM_19CR1"
+    },
+    "definitions": {
+        "OIM_12213": {
+            "baseTemplate": "Basic WebLogic Server Domain",
+            "extensionTemplates": [
+                "Oracle Identity Manager"
+            ],
+            "serverGroupsToTarget": [ "SOA-MGD-SVRS", "OIM-MGD-SVRS" ],
+            "rcuSchemas": [ "WLS", "MDS", "IAU", "IAU_VIEWER", "IAU_APPEND", "OPSS", "STB", "SOAINFRA", "UCSUMS", "OIM" ]
+        },
+        "OIM_19CR1": {
+            "baseTemplate": "Basic WebLogic Server Domain",
+            "extensionTemplates": [
+                "Oracle Identity Manager"
+            ],
+            "serverGroupsToTarget": [ "SOA-MGD-SVRS", "OIM-MGD-SVRS" ],
+            "rcuSchemas": [ "WLS", "MDS", "IAU", "IAU_VIEWER", "IAU_APPEND", "OPSS", "STB", "SOAINFRA", "UCSUMS", "OIM" ]
+        }
+    },
+    "system-elements": {
+        "apps": [
+            "^coherence-transaction-rar$",
+            "^DMS Application.*",
+            "^em$",
+            "^FMW Welcome Page Application.*",
+            "^opss-rest$",
+            "^state-management-provider-memory-rar.*",
+            "^wsil-wls.*",
+            "^wsm-pm$",
+            "^FileAdapter$",
+            "^DbAdapter$",
+            "^JmsAdapter$",
+            "^AqAdapter$",
+            "^SocketAdapter$",
+            "^MQSeriesAdapter$",
+            "^OracleBamAdapter$",
+            "^UMSAdapter$",
+            "^CoherenceAdapter$",
+            "^LdapAdapter$",
+            "^MSMQAdapter$",
+            "^SAPAdapter$",
+            "^SiebelAdapter$",
+            "^FtpAdapter$",
+            "^OracleAppsAdapter$",
+            "^JDEWorldAdapter$",
+            "^Cloudsdk$",
+            "^usermessagingserver$",
+            "^usermessagingdriver-apns$",
+            "^usermessagingdriver-email$",
+            "^usermessagingdriver-extension$",
+            "^usermessagingdriver-gcm$",
+            "^usermessagingdriver-smpp$",
+            "^usermessagingdriver-twitter$",
+            "^usermessagingdriver-xmpp$",
+            "^soa-webapps$",
+            "^soa-infra$",
+            "^worklistapp$",
+            "^b2bui$",
+            "^DefaultToDoTaskFlow$"
+        ],
+        "coherence-clusters": [
+            "^defaultCoherenceCluster$"
+        ],
+        "datasources": [
+            ".*LocalSvcTblDataSource$",
+            ".*mds-owsm$",
+            ".*opss-audit-DBDS$",
+            ".*opss-audit-viewDS$",
+            ".*opss-data-source$",
+            ".*opss-ds$",
+            ".*WLSSchemaDataSource$",
+            ".*SOADataSource",
+            ".*EDNDataSource",
+            ".*EDNLocalTxDataSource",
+            ".*SOALocalTxDataSource",
+            ".*mds-soa"
+        ],
+        "file-stores": [
+            "^JRFWSAsyncFileStore$",
+            "^mds-owsm$",
+            "^mds-soa$",
+            "^UMSJMSFileStore$",
+            "^BPMJMSFileStore$",
+            "^SOAJMSFileStore$"
+
+        ],
+        "jms": [
+            "^JRFWSAsyncJmsModule$",
+            "^UMSJMSSystemResource$",
+            "^UMSAQJMSSystemResource$",
+            "^BPMJMSModule$",
+            "^SOAJMSModule$"
+        ],
+        "jms-servers": [
+            "^JRFWSAsyncJmsServer$",
+            "^UMSJMSServer$",
+            "^BPMJMSServer$",
+            "^SOAJMSServer$"
+        ],
+        "shared-libraries": [
+            "^adf\\.oracle\\.businesseditor.*",
+            "^adf\\.oracle\\.domain.*",
+            "^adf\\.oracle\\.domain\\.webapp.*",
+            "^em_common.*",
+            "^em_core_ppc_pojo_jar$",
+            "^em_error.*",
+            "^em_sdkcore_ppc_public_pojo_jar$",
+            "^emai\\.fmctrl\\.dep$",
+            "^emagentsdk_jar.*",
+            "^emagentsdkimpl_jar.*",
+            "^emagentsdkimplpriv_jar.*",
+            "^emas$",
+            "^emcore$",
+            "^emcore_jar$",
+            "^emcoreclient_jar$",
+            "^emcorecommon_jar$",
+            "^emcoreconsole_jar$",
+            "^emcoreintsdk_jar.*",
+            "^emcorepbs_jar$",
+            "^emcoresdk_jar.*",
+            "^emcoresdkimpl_jar.*",
+            "^jsf.*",
+            "^jstl.*",
+            "^log4j_jar.*",
+            "^odl\\.clickhistory.*",
+            "^odl\\.clickhistory\\.webapp.*",
+            "^ohw-rcf.*",
+            "^ohw-uix.*",
+            "^oracle\\.adapter\\.*",
+            "^oracle\\.adf\\.dconfigbeans.*",
+            "^oracle\\.adf\\.desktopintegration.*",
+            "^oracle\\.adf\\.desktopintegration\\.model.*",
+            "^oracle\\.adf\\.management.*",
+            "^oracle\\.bi\\.adf\\.model\\.slib.*",
+            "^oracle\\.bi\\.adf\\.view\\.slib.*",
+            "^oracle\\.bi\\.adf\\.webcenter\\.slib.*",
+            "^oracle\\.bi\\.composer.*",
+            "^oracle\\.bi\\.jbips.*",
+            "^oracle\\.bpm\\.*",
+            "^oracle\\.dconfig-infra.*",
+            "^oracle\\.jrf\\.system\\.filter$",
+            "^oracle\\.jsp\\.next.*",
+            "^oracle\\.pwdgen.*",
+            "^oracle\\.sdp\\.client.*",
+            "^oracle\\.sdp\\.messaging.*",
+            "^oracle\\.soa\\.*",
+            "^oracle\\.cloud\\.*",
+            "^oracle\\.ucs\\.*",
+            "^oracle\\.webcenter\\.composer.*",
+            "^oracle\\.webcenter\\.skin.*",
+            "^oracle\\.wsm\\.console.*",
+            "^oracle\\.wsm\\.idmrest.*",
+            "^oracle\\.wsm\\.seedpolicies.*",
+            "^orai18n-adf.*",
+            "^owasp\\.esapi.*",
+            "^soa\\.em*",
+            "^UIX.*"
+        ],
+        "shutdown-classes": [
+            "^DMSShutdown$",
+            "^JOC-Shutdown$"
+        ],
+        "startup-classes": [
+            "^JMX Framework Startup Class$",
+            "^JOC-Startup$",
+            "^JPS Startup Class$",
+            "^JPS Startup Post-Activation Class$",
+            "^WSM Startup Class$",
+            "^Web Services Startup Class$",
+            "^JRF Startup Class$",
+            "^ODL-Startup$",
+            "^DMS-Startup$",
+            "^AWT Application Context Startup Class$"
+        ],
+        "wldf": [
+            "^Module-FMWDFW$"
+        ]
+    }
+}
