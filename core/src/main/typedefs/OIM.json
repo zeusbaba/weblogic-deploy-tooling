@@ -28,6 +28,7 @@
     "system-elements": {
         "apps": [
             "^coherence-transaction-rar$",
+            "^Cloudsdk$",
             "^DMS Application.*",
             "^em$",
             "^FMW Welcome Page Application.*",
@@ -50,6 +51,8 @@
             "^SiebelAdapter$",
             "^FtpAdapter$",
             "^OracleAppsAdapter$",
+            "^oracle.iam.*",
+            "^oim$",
             "^JDEWorldAdapter$",
             "^Cloudsdk$",
             "^usermessagingserver$",
@@ -146,6 +149,8 @@
             "^oracle\\.bi\\.jbips.*",
             "^oracle\\.bpm\\.*",
             "^oracle\\.dconfig-infra.*",
+            "^oracle\\.iam.*",
+            "^oracle\\.idm.*",
             "^oracle\\.jrf\\.system\\.filter$",
             "^oracle\\.jsp\\.next.*",
             "^oracle\\.pwdgen.*",
