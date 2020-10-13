@@ -32,6 +32,47 @@ pipeline {
                 '''
             }
         }
+        stage('Unit Tests') {
+            failFast true
+            parallel {
+                stage ('Test 12.2.1.3') {
+                    agent {
+                        docker {
+                            alwaysPull true
+                            reuseNode true
+                            image 'phx.ocir.io/weblogick8s/wdt/jenkinsslave:wls12213'
+                            args '-u jenkins -v /var/run/docker.sock:/var/run/docker.sock'
+                        }
+                    }
+                    steps {
+                        sh 'mvn -Dunit-test-wlst-dir=${WLST_DIR} test'
+                    }
+                    post {
+                        always {
+                            junit 'core/target/surefire-reports/*.xml'
+                        }
+                    }
+                }
+                stage ('Test 14.1.1') {
+                    agent {
+                        docker {
+                            alwaysPull true
+                            reuseNode true
+                            image 'phx.ocir.io/weblogick8s/wdt/jenkinsslave:wls12213'
+                            args '-u jenkins -v /var/run/docker.sock:/var/run/docker.sock'
+                        }
+                    }
+                    steps {
+                        sh 'mvn -Dunit-test-wlst-dir=${WLST_DIR} test'
+                    }
+                    post {
+                        always {
+                            junit 'core/target/surefire-reports/*.xml'
+                        }
+                    }
+                }
+            }
+        }
         stage ('Test') {
             agent {
                 docker {
