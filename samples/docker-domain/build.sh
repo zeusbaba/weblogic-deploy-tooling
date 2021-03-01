@@ -8,12 +8,12 @@
 # parse the ADMIN_HOST, ADMIN_PORT, MS_PORT, and DOMAIN_NAME from the sample properties file and pass
 # as a string of --build-arg in the variable BUILD_ARG
 . container-scripts/setEnv.sh properties/docker-build/domain.properties
-
+export WEBLOGIC_DOCKER_IMAGE=12214-domain-wdt
 
 docker build \
-    $BUILD_ARG \
-    --build-arg WDT_MODEL=simple-topology.yaml \
-    --build-arg WDT_VARIABLE=properties/docker-build/domain.properties \
-    --build-arg WDT_ARCHIVE=archive.zip \
-    --force-rm=true \
-    -t 12213-domain-wdt .
+  $BUILD_ARG \
+  --build-arg WDT_MODEL=simple-topology.yaml \
+  --build-arg WDT_VARIABLE=properties/docker-build/domain.properties \
+  --build-arg WDT_ARCHIVE=archive.zip \
+  --force-rm=true \
+  -t $WEBLOGIC_DOCKER_IMAGE .

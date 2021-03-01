@@ -34,7 +34,7 @@ If you prefer, you may want to build your own base image, using the docker-image
 
 The WebLogic Deploy Tool installer is required to build this image. Add `weblogic-deploy.zip` to the sample directory.
 
-    $ wget https://github.com/oracle/weblogic-deploy-tooling/releases/download/weblogic-deploy-tooling-0.11/weblogic-deploy.zip
+    $ wget https://github.com/oracle/weblogic-deploy-tooling/releases/latest/download/weblogic-deploy.zip
 
 This sample deploys a simple, one-page web application contained in a ZIP archive. This archive needs to be built (one time only) before building the Docker image.
 
@@ -79,17 +79,18 @@ This sample provides a script which will read the model variable file and parse 
   This will insure that the values docker exposes and persists in the image are the same values configured in the domain.
 
 To parse the sample variable file and build the sample, run:
-
-     $ container-scripts/setEnv.sh properties/docker-build/domain.properties 
-
-     $ docker build \
-          $BUILD_ARG \
-          --build-arg WDT_MODEL=simple-topology.yaml \
-          --build-arg WDT_ARCHIVE=archive.zip \
-          --build-arg WDT_VARIABLE=properties/docker-build/domain.properties \
-          --force-rm=true \
-          -t 12213-domain1-wdt:1.0 .
-
+```
+    $ container-scripts/setEnv.sh properties/docker-build/domain.properties
+    $ export WEBLOGIC_DOCKER_IMAGE=12213-domain-wdt
+    
+    $ docker build \
+         $BUILD_ARG \
+         --build-arg WDT_MODEL=simple-topology.yaml \
+         --build-arg WDT_ARCHIVE=archive.zip \
+         --build-arg WDT_VARIABLE=properties/docker-build/domain.properties \
+         --force-rm=true \
+         -t $WEBLOGIC_DOCKER_IMAGE .
+```  
 This sample provides a Derby Data Source that is targeted to the Managed Server cluster. The Derby database is created
   in the Admin Server container when the container is run. To turn off the database create, set DERBY_FLAG="false" in the 
   runtime security.properties used on the docker run statement.
@@ -114,6 +115,27 @@ To start an additional Managed Server (in this example managed-server-2), run:
 The above scenario from this sample will give you a WebLogic domain with a dynamic cluster set up on a single host environment.
 
 You may create more containerized Managed Servers by calling the `docker` command above for `startManagedServer.sh` as long you link properly with the Administration Server. For an example of a multi-host environment, see the sample `1221-multihost`.
+
+#### using docker-compose  
+Ensure that you've already built the docker image as noted.  
+To recap, simply run    
+```
+# ensure that app archive is ready  
+./build-archive.sh  
+  
+# nb! remember to log in with Docker to Oracle's container-registry, simply by running   
+# `docker login container-registry.oracle.com`  
+# ensure that docker image is built and ready   
+./build.sh  
+
+# check that image is ready in your local Docker repo  
+docker images  
+```
+
+Now you can run `docker-compose to `launch Admin-Server and MS-Server    
+```  
+docker-compose --env-file docker-compose.env up
+```
 
 # Copyright
 Copyright (c) 2018 Oracle Corporation and/or its affiliates.  All rights reserved.

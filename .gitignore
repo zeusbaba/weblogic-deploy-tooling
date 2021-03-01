@@ -1,3 +1,9 @@
+.*
+!.gitignore
+**/weblogic-deploy.zip
+**/archive.zip
+**/localtemp/*
+
 *~
 *#
 .#*

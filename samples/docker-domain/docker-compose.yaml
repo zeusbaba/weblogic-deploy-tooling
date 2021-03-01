@@ -1,0 +1,48 @@
+version: "3.9"
+
+networks:
+  my-wls-network:
+    driver: bridge
+
+services:
+
+  ## Admin Server
+  # docker run -d --name wlsadmin --hostname wlsadmin -p 7001:7001 \
+  #  -v $WORK_DIR/properties/docker-run:/u01/oracle/properties \
+  #  $WEBLOGIC_DOCKER_IMAGE
+  wls-admin-server:
+    image: $WEBLOGIC_DOCKER_IMAGE
+    container_name: wlsadmin
+    hostname: wlsadmin
+    ports:
+      - "7001:7001"
+      - "8453:8453"
+    #environment:
+    #  - hostname=wlsadmin
+    #  - name=wlsadmin
+    volumes:
+      - $WORK_DIR/properties/docker-run:/u01/oracle/properties
+    networks:
+      - my-wls-network
+
+  ## MS Server 1
+  # docker run -d --name managed-server-1 --link wlsadmin:wlsadmin -p 8001:8001 \
+  #  -v $WORK_DIR/properties/docker-run:/u01/oracle/properties -e MANAGED_SERVER_NAME=managed-server-1 \
+  #  $WEBLOGIC_DOCKER_IMAGE startManagedServer.sh
+  wls-managed-server-1:
+    command: ["startManagedServer.sh"]
+    image: $WEBLOGIC_DOCKER_IMAGE
+    container_name: managed-server-1
+    ports:
+      - "9001:9001"
+    environment:
+      - MANAGED_SERVER_NAME=managed-server-1
+    volumes:
+      - $WORK_DIR/properties/docker-run:/u01/oracle/properties
+    networks:
+      - my-wls-network
+    links:
+      - wls-admin-server
+    depends_on:
+      - wls-admin-server
+
